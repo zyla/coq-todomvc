@@ -1,0 +1,12 @@
+node_modules/
+*.aux
+.merlin
+*.glob
+*.v.d
+*.vo
+all.pdf
+html/
+lib/bs/
+/src/app.ml
+/src/app.mli
+*.bs.js

@@ -1,0 +1,14 @@
+Thu Sep  3 16:08:20 CEST 2018
+
+Started.
+Experimenting with doing extraction without incurring assumptions, using the
+module system.
+
+Thu Sep  6 08:39:20 CEST 2018
+
+Ditched the module system idea, this made stuff simpler.
+
+Found the `bucklescript-tea` package and added it.
+Added a basic app that does nothing.
+
+Currently struggling with String extraction. Found this: https://stackoverflow.com/a/25623226
