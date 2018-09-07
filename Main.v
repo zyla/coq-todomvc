@@ -6,6 +6,9 @@ Require Import Extraction.
 Import ListNotations.
 Local Open Scope string_scope.
 
+Require Import ExtrOcamlBasic.
+Require Import ExtrOcamlString.
+
 Module Html.
   Parameter html : Set -> Set.
   Parameter el : forall {A}, string -> list (html A) -> html A.
@@ -19,24 +22,27 @@ Module App.
 
 Import Html.
 Definition model := string.
-Inductive event :=.
+Inductive event := Dummy1 : event | Dummy2 : event.
 
-Definition init : model := "John".
+Definition init (_ : unit) : model := "John Smith".
 
 Definition view (name : model) : html event :=
   el "div"
-    [ el "h2" [ text "Hello world" ]
+    [ el "h2" [ text "Hello world!!!!!" ]
     ; el "p" [ text ("Hello, " ++ name ++ "!") ]
+    ; el "p" [ text ("Hello again, " ++ name) ]
+    ; el "strong" [ text "lol" ]
     ].
 
 Definition update (m : model) (msg : event) : model :=
-  match msg with end.
+  m.
 
 End App.
 
 Extract Constant Html.html "'a" => "'a Vdom.t".
-Extract Constant Html.el => "(fun tag -> Vdom.node tag [])".
-Extract Constant Html.text => "Vdom.text".
+Extract Constant Html.el => "(fun tag -> Vdom.node (Utils.camlstring_of_coqstring tag) [])".
+Extract Constant Html.text => "(fun t -> Vdom.text (Utils.camlstring_of_coqstring t))".
+
 
 Extraction "src/app.ml" App.
 

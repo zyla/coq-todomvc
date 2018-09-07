@@ -10,3 +10,5 @@ lib/bs/
 /src/app.ml
 /src/app.mli
 *.bs.js
+\#*\#
+.bsb.lock

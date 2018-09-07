@@ -4,6 +4,8 @@ open Tea.App
 (* This opens the Elm-style virtual-dom functions and types into the current scope *)
 open Tea.Html
 
+open App
+
 (* This is the main function, it can be named anything you want but `main` is traditional.
   The Program returned here has a set of callbacks that can easily be called from
   Bucklescript or from javascript for running this main attached to an element,
@@ -13,6 +15,6 @@ open Tea.Html
 let main =
   beginnerProgram { (* The beginnerProgram just takes a set model state and the update and view functions *)
     model = App.init (); (* Since model is a set value here, we call our init function to generate that value *)
-    App.update;
-    App.view;
+    update = App.update;
+    view = App.view;
   }
