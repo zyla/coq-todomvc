@@ -12,3 +12,12 @@ Found the `bucklescript-tea` package and added it.
 Added a basic app that does nothing.
 
 Currently struggling with String extraction. Found this: https://stackoverflow.com/a/25623226
+
+Sat Sep  7 20:07:25 CEST 2018
+
+First working version.
+
+TIL there are `ExtrOcamlBasic` and `ExtrOcamlString` modules in the stdlib.
+
+Sources:
+- `Camlcoq` from https://github.com/AbsInt/CompCert
