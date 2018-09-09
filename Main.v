@@ -4,11 +4,15 @@
 Require Import String.
 Require Import Extraction.
 Require Import List.
-Import ListNotations.
-Local Open Scope string_scope.
-
 Require Import ExtrOcamlBasic.
 Require Import ExtrOcamlString.
+
+Require Import Records.Records.
+
+Import ListNotations.
+Local Open Scope string_scope.
+Local Open Scope record.
+
 
 Module Html.
   Definition tag_name := string.
@@ -32,21 +36,34 @@ Module App.
 
 Import Html.
 
-Definition model := string.
-Inductive event := Dummy1 : event | Dummy2 : event.
+Definition _first_name := "first_name".
+Definition _last_name := "last_name".
 
-Definition init (_ : unit) : model := "John Smith".
+Definition model :=
+  {@ _first_name %e string
+   , _last_name %e string
+   @}.
+   
+Inductive event :=
+  | SetFirstName : string -> event.
 
-Definition view (name : model) : html event :=
+Definition init (_ : unit) : model :=
+  {# _first_name :- "John"
+   ; _last_name :- "Smith"
+   #}.
+
+Definition view (m : model) : html event :=
   el "div"
     [ el_attr "h2" [ ("style", "color: red;") ] [ text "Hello world!!!!!" ]
-    ; el_attr "p" [ ("style", "font-size: 300%;") ] [ text ("Hello, " ++ name ++ "!") ]
-    ; el "p" [ text ("Hello again, " ++ name) ]
+    ; el_attr "p" [ ("style", "font-size: 300%;") ] [ text ("Hello, " ++ (m !! _first_name) ++ "!") ]
+    ; el "p" [ text ("Hello again, " ++ (m !! _last_name)) ]
     ; el "strong" [ text "lol" ]
     ].
 
 Definition update (m : model) (msg : event) : model :=
-  m.
+  match msg with
+  | SetFirstName x => {# m with _first_name :- x #}
+  end.
 
 End App.
 
