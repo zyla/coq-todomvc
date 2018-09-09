@@ -1,8 +1,9 @@
 (* Web app writen in Coq *)
 (* Compiled to JS via BuckleScript *)
 
-Require Import String List.
+Require Import String.
 Require Import Extraction.
+Require Import List.
 Import ListNotations.
 Local Open Scope string_scope.
 
@@ -12,11 +13,12 @@ Require Import ExtrOcamlString.
 Module Html.
   Definition tag_name := string.
 
-  Inductive html (A : Set) : Type := (* TODO: Why does it have to be Type? *)
+  Inductive html (A : Set) : Set :=
     | Elem : string -> list (string * string) -> list (html A) -> html A
     | Text : string -> html A.
 
-  Definition el_attr : forall {A}, string -> list (string * string) -> list (html A) -> html A := Elem.
+  Definition el_attr : forall {A}, string -> list (string * string) -> list (html A) -> html A
+    := Elem.
   Definition text : forall {A}, string -> html A := Text.
   Definition el {A} : tag_name -> list (html A) -> html A :=
     fun tag => el_attr tag [].
@@ -29,6 +31,7 @@ End Html.
 Module App.
 
 Import Html.
+
 Definition model := string.
 Inductive event := Dummy1 : event | Dummy2 : event.
 
@@ -60,12 +63,3 @@ Extract Inductive Html.html => "Vdom.t" [
   ].
 
 Extraction "src/app.ml" App.
-
-
-
-(*
-
-Definition apply {A B} (f : A -> B) (x : A) : B := f x.
-Notation "f $ x" := (apply f x) (at level 90, right associativity).
-
-*)
