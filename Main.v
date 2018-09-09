@@ -10,10 +10,14 @@ Require Import ExtrOcamlBasic.
 Require Import ExtrOcamlString.
 
 Module Html.
+  Definition tag_name := string.
   Parameter html : Set -> Set.
-  Parameter el : forall {A}, string -> list (html A) -> html A.
+  Parameter el_attr : forall {A}, string -> list (string * string) -> list (html A) -> html A.
   Parameter text : forall {A}, string -> html A.
-  Definition el_ {A} tag : html A := el tag nil.
+  Definition el {A} : tag_name -> list (html A) -> html A :=
+    fun tag => el_attr tag [].
+  Definition el_ {A} : tag_name -> html A :=
+    fun tag => el tag nil.
 End Html.
 
 (* App *)
@@ -28,8 +32,8 @@ Definition init (_ : unit) : model := "John Smith".
 
 Definition view (name : model) : html event :=
   el "div"
-    [ el "h2" [ text "Hello world!!!!!" ]
-    ; el "p" [ text ("Hello, " ++ name ++ "!") ]
+    [ el_attr "h2" [ ("style", "color: red;") ] [ text "Hello world!!!!!" ]
+    ; el_attr "p" [ ("style", "font-size: 300%;") ] [ text ("Hello, " ++ name ++ "!") ]
     ; el "p" [ text ("Hello again, " ++ name) ]
     ; el "strong" [ text "lol" ]
     ].
@@ -40,7 +44,11 @@ Definition update (m : model) (msg : event) : model :=
 End App.
 
 Extract Constant Html.html "'a" => "'a Vdom.t".
-Extract Constant Html.el => "(fun tag -> Vdom.node (Utils.camlstring_of_coqstring tag) [])".
+Extract Constant Html.el_attr =>
+  "(fun tag attrs -> Vdom.node (Utils.camlstring_of_coqstring tag)
+     (List.map
+       (function (k, v) -> Vdom.Attribute ("""", Utils.camlstring_of_coqstring k, Utils.camlstring_of_coqstring v))
+       attrs))".
 Extract Constant Html.text => "(fun t -> Vdom.text (Utils.camlstring_of_coqstring t))".
 
 
