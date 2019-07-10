@@ -1,9 +1,6 @@
 (* This line opens the Tea.App modules into the current scope for Program access functions and types *)
 open Tea.App
 
-(* This opens the Elm-style virtual-dom functions and types into the current scope *)
-open Tea.Html
-
 open App
 
 (* This is the main function, it can be named anything you want but `main` is traditional.
