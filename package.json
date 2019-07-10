@@ -4,7 +4,8 @@
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
-    "watch": "bsb -make-world -w -ws _"
+    "watch": "bsb -make-world -w -ws _",
+    "server": "http-server"
   },
   "keywords": [
     "BuckleScript"
