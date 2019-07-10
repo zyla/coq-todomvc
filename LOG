@@ -21,3 +21,10 @@ TIL there are `ExtrOcamlBasic` and `ExtrOcamlString` modules in the stdlib.
 
 Sources:
 - `Camlcoq` from https://github.com/AbsInt/CompCert
+
+Wed 10 Jul 2019 04:57:05 PM CEST
+
+Set up CI.
+
+Sources:
+- https://github.com/coq-community/docker-coq/wiki/CI-setup
