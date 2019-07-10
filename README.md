@@ -1,20 +1,18 @@
+[![Build Status](https://travis-ci.org/zyla/coq-webapp.svg?branch=master)](https://travis-ci.org/zyla/coq-webapp)
 
+Web app (frontend only) writen in Coq.
+Compiled to JS via BuckleScript. Uses `bucklescript-tea` Elm clone library.
 
-# Build
-```
-npm run build
-```
+Currently there's only one Coq module (`Main.v`) which contains bindings to TEA,
+application code and extraction.
 
-# Watch
+# Development
 
-```
-npm run watch
-```
+Dependencies: `yarn`
 
-create a http-server
+BuckleScript watcher: `yarn watch`
 
-```
-npm install -g http-server
-```
+HTTP server for the app: `yarn server`
 
-Edit the file and see the changes automatically reloaded in the browser
+Compiling the Coq module will trigger BuckleScript watcher, and in turn
+livereload.
