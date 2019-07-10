@@ -12,3 +12,6 @@ lib/bs/
 *.bs.js
 \#*\#
 .bsb.lock
+
+Makefile
+Makefile.conf
