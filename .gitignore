@@ -13,6 +13,6 @@ lib/bs/
 \#*\#
 .bsb.lock
 
-Makefile
-Makefile.conf
+Makefile.coq
+Makefile.coq.conf
 .coqdeps.d
