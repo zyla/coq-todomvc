@@ -14,9 +14,11 @@ Record model := mkModel
                   { tasks : list Task
                   }.
    
+Inductive TaskAction :=
+  | Toggle : TaskAction.
+
 Inductive event :=
-  | TweakName : event
-  | Noop : event.
+  | TaskAction_ : nat -> TaskAction -> event.
 
 Definition init (_ : unit) : model :=
   {| tasks :=
@@ -31,6 +33,12 @@ Definition init (_ : unit) : model :=
 
 (* TODO: implement this *)
 Definition string_of_nat (n : nat) : string := "0".
+
+Fixpoint map_with_index {A B: Type} (f : nat -> A -> B) (l : list A) : list B :=
+  match l with
+  | [] => []
+  | x :: xs => f 0 x :: map_with_index f xs
+  end.
 
 Definition view (m : model) : html event :=
   el_attr "section"
@@ -95,8 +103,7 @@ Definition view (m : model) : html event :=
 
 Definition update (m : model) (msg : event) : model :=
   match msg with
-  | TweakName => m
-  | Noop => m
+  | TaskAction_ _ _ => m
   end.
 
 End App.
