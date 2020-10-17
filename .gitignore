@@ -16,3 +16,5 @@ lib/bs/
 Makefile.coq
 Makefile.coq.conf
 .coqdeps.d
+
+*~

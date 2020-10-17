@@ -28,3 +28,9 @@ Set up CI.
 
 Sources:
 - https://github.com/coq-community/docker-coq/wiki/CI-setup
+
+Sat Oct 17 07:45:46 UTC 2020
+
+Decided to implement something actually real.
+First, get rid of the weird record library, and just generate record update functions via some script.
+Then: implement TodoMVC.
