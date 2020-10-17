@@ -1,47 +1,43 @@
 Require Import String.
 Require Import List.
-Require Import Records.Records.
 
 Import ListNotations.
 Open Scope string_scope.
-Open Scope record.
 
 Require Import Html.
 
 Module App.
 
-Definition _first_name := "first_name".
-Definition _last_name := "last_name".
+Record Person := mkPerson { first_name : string; last_name : string }.
 
-Definition model :=
-  {@ _first_name %e string
-   , _last_name %e string
-   @}.
+Definition model := Person.
    
 Inductive event :=
   | TweakName : event
   | Noop : event.
 
 Definition init (_ : unit) : model :=
-  {# _first_name :- "John"
-   ; _last_name :- "Smith"
-   #}.
+  {| first_name := "John";
+     last_name := "Smith"
+  |}.
 
 Definition view (m : model) : html event :=
   el "div"
     [ el_attr "h2" [ "style"=:"color: red;" ] [ text "Hello world!!!!!" ]
-    ; el_attr "p" [ "style"=:"font-size: 300%;" ] [ text ("Hello, " ++ (m !! _first_name) ++ "!") ]
-    ; el "p" [ text ("Hello again, " ++ (m !! _last_name)) ]
+    ; el_attr "p" [ "style"=:"font-size: 300%;" ] [ text ("Hello, " ++ m.(first_name) ++ "!") ]
+    ; el "p" [ text ("Hello again, " ++ m.(last_name)) ]
     ; el "strong" [ text "lol" ]
     ; el "p"
       [ el_attr "button" [ on "click" TweakName ] [ text "Change" ] ]
     ].
 
+Notation "r '.{|' 'first_name' ':=' x '|}'" := (match r with mkPerson _ last_name => mkPerson x last_name end) (at level 50).
+
 Definition update (m : model) (msg : event) : model :=
   match msg with
   | TweakName =>
-      let new_name := if string_dec (m !! _first_name) "John" then "Alice" else "John"
-      in {# m with _first_name :- new_name #}
+      let new_name := if string_dec m.(first_name) "John" then "Alice" else "John"
+      in m .{| first_name := new_name |}
   | Noop => m
   end.
 
