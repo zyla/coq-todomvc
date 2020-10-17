@@ -12,7 +12,7 @@ env:
   - NJOBS="2"
   - CONTRIB_NAME="coq-webapp"
   matrix:
-  - COQ_IMAGE="coqorg/coq:8.8"
+  - COQ_IMAGE="coqorg/coq:8.12"
 
 install: |
   # Prepare the COQ container
@@ -25,7 +25,7 @@ install: |
     set -ex  # -e = exit on failure; -x = trace for debug
     if [ -n \"\${COMPILER_EDGE}\" ]; then opam switch \${COMPILER_EDGE}; eval \$(opam env); fi
     opam update -y
-    opam install -y -j ${NJOBS} coq-extensible-records
+    #opam install -y -j ${NJOBS} coq-extensible-records
     opam config list
     opam repo list
     opam list
