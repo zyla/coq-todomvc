@@ -4,6 +4,8 @@ node_modules/
 *.glob
 *.v.d
 *.vo
+*.vok
+*.vos
 all.pdf
 html/
 lib/bs/
@@ -15,6 +17,7 @@ lib/bs/
 
 Makefile.coq
 Makefile.coq.conf
+.Makefile.coq.d
 .coqdeps.d
 
 *~

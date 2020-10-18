@@ -1,4 +1,5 @@
 Require Import String.
+Require Import DecimalString.
 Require Import List.
 
 Import ListNotations.
@@ -10,17 +11,29 @@ Module App.
 
 Record Task := mkTask { description : string; completed : bool }.
 
-Record model := mkModel
-                  { tasks : list Task
-                  }.
-   
+Module Task.
+  Definition toggle (t : Task) : Task :=
+    match t with mkTask d completed => mkTask d (negb completed) end.
+End Task.
+
+Record Model := mkModel
+  { tasks : list Task
+  }.
+
+Module Model.
+  Definition t := Model.
+  Definition over_tasks (f : list Task -> list Task) (r : t) : t :=
+    match r with mkModel x => mkModel (f x) end.
+End Model.
+
 Inductive TaskAction :=
-  | Toggle : TaskAction.
+  | Toggle : TaskAction
+  | Delete : TaskAction.
 
 Inductive event :=
   | TaskAction_ : nat -> TaskAction -> event.
 
-Definition init (_ : unit) : model :=
+Definition init (_ : unit) : Model.t :=
   {| tasks :=
        [ {| description := "Prove this app";
             completed := false
@@ -31,16 +44,39 @@ Definition init (_ : unit) : model :=
        ]
   |}.
 
-(* TODO: implement this *)
-Definition string_of_nat (n : nat) : string := "0".
+Definition string_of_nat (n : nat) : string := NilZero.string_of_uint (Nat.to_uint n).
 
-Fixpoint map_with_index {A B: Type} (f : nat -> A -> B) (l : list A) : list B :=
-  match l with
-  | [] => []
-  | x :: xs => f 0 x :: map_with_index f xs
+Definition map_with_index {A B: Type} (f : nat -> A -> B) : list A -> list B :=
+  let fix go i l :=
+    match l with
+    | [] => []
+    | x :: xs => f i x :: go (1 + i) xs
+    end
+  in go 0.
+
+Fixpoint update_at {A} (index : nat) (f : A -> A) (l : list A) : list A :=
+  match index, l with
+  | _, [] => []
+  | 0, x :: xs => f x :: xs
+  | S i, x :: xs => x :: update_at i f xs
   end.
 
-Definition view (m : model) : html event :=
+Fixpoint delete_at {A} (index : nat) (l : list A) : list A :=
+  match index, l with
+  | _, [] => []
+  | 0, x :: xs => xs
+  | S i, x :: xs => x :: delete_at i xs
+  end.
+
+Definition num_incomplete m := length (filter (fun t => negb t.(completed)) m.(tasks)).
+
+Definition update (m : Model.t) (msg : event) : Model.t :=
+  match msg with
+  | TaskAction_ index Toggle => Model.over_tasks (update_at index Task.toggle) m
+  | TaskAction_ index Delete => Model.over_tasks (delete_at index) m
+  end.
+
+Definition view (m : Model.t) : html event :=
   el_attr "section"
     [ "class"=:"todoapp" ]
     [ el_attr "header"
@@ -53,36 +89,42 @@ Definition view (m : model) : html event :=
                   []
         ]
     ; el_attr "section"
-              [ "class"=:"main" ]
-              [ el_attr "input"
-                        ["type"=:"checkbox"; "id"=:"toggle-all"; "class"=:"toggle-all" ] []
-              ; el_attr "label" [ "for"=:"toggle-all" ]
-                      [ text "Mark all as complete" ]
-              ; el_attr "ul" [ "class"=:"todo-list" ]
-                        (map
-                        (fun task =>
-                             el_attr "li"
-                                     (if task.(completed) then [ "class"=:"completed" ] else [])
-                                     [ el_attr "div" [ "class"=:"view" ]
-                                               [ el_attr "input"
-                                                         ([ "type" =: "checkbox"; "class"=:"toggle" ] ++
-                                                                                                      (if task.(completed) then ["checked"=:""] else [])) []
-                                               ; el "label" [ text task.(description) ]
-                                               ; el_attr "button" [ "class"=:"destroy" ] []
-                                               ]
-                                     ; el_attr "input" ["class"=:"edit"] []
-                                     ]
-                        )
-                        m.(tasks))
-              ]
+        [ "class"=:"main" ]
+        [ el_attr "input"
+            ["type"=:"checkbox"; "id"=:"toggle-all"; "class"=:"toggle-all" ] []
+        ; el_attr "label" [ "for"=:"toggle-all" ]
+            [ text "Mark all as complete" ]
+        ; el_attr "ul" [ "class"=:"todo-list" ]
+            (map_with_index
+            (fun index task =>
+                 el_attr "li"
+                         (if task.(completed) then [ "class"=:"completed" ] else [])
+                         [ el_attr "div" [ "class"=:"view" ]
+                                   [ el_attr "input"
+                                             ([ "type" =: "checkbox"
+                                              ; "class"=:"toggle"
+                                              ; on "change" (TaskAction_ index Toggle)
+                                              ] ++
+                                        (if task.(completed) then ["checked"=:""] else [])) []
+                                   ; el "label" [ text task.(description) ]
+                                   ; el_attr "button"
+                                             [ "class"=:"destroy"
+                                             ; on "click" (TaskAction_ index Delete) 
+                                             ] []
+                                   ]
+                         ; el_attr "input" ["class"=:"edit"] []
+                         ]
+            )
+            m.(tasks))
+        ]
     ; el_attr "footer" [ "class"=:"footer" ]
-              [ el_attr "span" [ "class"=:"todo-count" ]
-                        [ el "strong" [ text (string_of_nat (length m.(tasks))) ]
-                        ; text " item left"
-                        ]
-                ; el_attr "button" [ "class"=:"clear-completed" ]
-                          [ text "Clear completed" ]
-              ]
+        [ el_attr "span" [ "class"=:"todo-count" ]
+            [ el "strong" [ text (string_of_nat (num_incomplete m)) ]
+            ; text " item left"
+            ]
+          ; el_attr "button" [ "class"=:"clear-completed" ]
+                    [ text "Clear completed" ]
+        ]
     ].
 
 (* TODO: implement filters
@@ -100,10 +142,5 @@ Definition view (m : model) : html event :=
 					</li>
 				</ul>
 *)
-
-Definition update (m : model) (msg : event) : model :=
-  match msg with
-  | TaskAction_ _ _ => m
-  end.
 
 End App.
