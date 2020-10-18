@@ -31,7 +31,8 @@ Inductive TaskAction :=
   | Delete : TaskAction.
 
 Inductive event :=
-  | TaskAction_ : nat -> TaskAction -> event.
+  | TaskAction_ : nat -> TaskAction -> event
+  | ClearCompleted : event.
 
 Definition init (_ : unit) : Model.t :=
   {| tasks :=
@@ -74,6 +75,8 @@ Definition update (m : Model.t) (msg : event) : Model.t :=
   match msg with
   | TaskAction_ index Toggle => Model.over_tasks (update_at index Task.toggle) m
   | TaskAction_ index Delete => Model.over_tasks (delete_at index) m
+  | ClearCompleted => 
+      Model.over_tasks (filter (fun t => negb t.(completed))) m
   end.
 
 Definition pluralize (n : nat) (singular : string) (plural : string) :=
@@ -127,9 +130,9 @@ Definition view (m : Model.t) : html event :=
         [ let n := num_incomplete m in
           el_attr "span" [ "class"=:"todo-count" ]
             [ el "strong" [ text (string_of_nat n) ]
-            ; text (" " ++ pluralize n "item" "items" ++ " left"
+            ; text (" " ++ pluralize n "item" "items" ++ " left")
             ]
-          ; el_attr "button" [ "class"=:"clear-completed" ]
+          ; el_attr "button" [ "class"=:"clear-completed"; on "click" ClearCompleted ]
                     [ text "Clear completed" ]
         ]
     ].
