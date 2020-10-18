@@ -1,0 +1,7 @@
+version: '2.1'
+
+services:
+  nginx:
+    image: nginx:1.15-alpine
+    volumes:
+      - .:/usr/share/nginx/html
