@@ -4,6 +4,7 @@ Require Import List.
 
 Import ListNotations.
 Open Scope string_scope.
+Open Scope list_scope.
 
 Require Import Html.
 
@@ -18,12 +19,15 @@ End Task.
 
 Record Model := mkModel
   { tasks : list Task
+  ; new_todo_text : string
   }.
 
 Module Model.
   Definition t := Model.
   Definition over_tasks (f : list Task -> list Task) (r : t) : t :=
-    match r with mkModel x => mkModel (f x) end.
+    match r with mkModel x y => mkModel (f x) y end.
+  Definition over_new_todo_text (f : string -> string) (r : t) : t :=
+    match r with mkModel x y => mkModel x (f y) end.
 End Model.
 
 Inductive TaskAction :=
@@ -32,7 +36,9 @@ Inductive TaskAction :=
 
 Inductive event :=
   | TaskAction_ : nat -> TaskAction -> event
-  | ClearCompleted : event.
+  | ClearCompleted : event
+  | AddTodo : event
+  | ChangeNewTodoText : string -> event.
 
 Definition init (_ : unit) : Model.t :=
   {| tasks :=
@@ -42,7 +48,8 @@ Definition init (_ : unit) : Model.t :=
        ; {| description := "Buy a unicorn";
             completed := true
          |}
-       ]
+       ];
+     new_todo_text := ""
   |}.
 
 Definition string_of_nat (n : nat) : string := NilZero.string_of_uint (Nat.to_uint n).
@@ -73,10 +80,17 @@ Definition num_incomplete m := length (filter (fun t => negb t.(completed)) m.(t
 
 Definition update (m : Model.t) (msg : event) : Model.t :=
   match msg with
-  | TaskAction_ index Toggle => Model.over_tasks (update_at index Task.toggle) m
-  | TaskAction_ index Delete => Model.over_tasks (delete_at index) m
+  | TaskAction_ index Toggle =>
+      Model.over_tasks (update_at index Task.toggle) m
+  | TaskAction_ index Delete =>
+      Model.over_tasks (delete_at index) m
   | ClearCompleted => 
       Model.over_tasks (filter (fun t => negb t.(completed))) m
+  | ChangeNewTodoText s =>
+      Model.over_new_todo_text (fun _ => s) m
+  | AddTodo =>
+      Model.over_tasks (fun tasks => tasks ++ [{| description := m.(new_todo_text); completed := false |}])
+      (Model.over_new_todo_text (fun _ => "") m)
   end.
 
 Definition pluralize (n : nat) (singular : string) (plural : string) :=
@@ -91,11 +105,17 @@ Definition view (m : Model.t) : html event :=
     [ el_attr "header"
         [ "class"=:"header" ]
         [ el "h1" [ text "todos" ]
-        ; el_attr "input"
+        ; el_attr "form"
+          [ on_with_opts "submit" prevent_default_opts (Decoder.pure AddTodo) ]
+          [ el_attr "input"
                   [ "class"=:"new-todo"
                   ; "placeholder"=:"What needs to be done?"
-                  ; "autofocus" =: "" ]
+                  ; "autofocus" =: ""
+                  ; prop "value" m.(new_todo_text)
+                  ; on_with_opts "input" default_options (Decoder.map ChangeNewTodoText Decoder.targetValue)
+                  ]
                   []
+          ]
         ]
     ; el_attr "section"
         [ "class"=:"main" ]
