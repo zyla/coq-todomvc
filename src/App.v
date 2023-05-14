@@ -100,14 +100,14 @@ Definition pluralize (n : nat) (singular : string) (plural : string) :=
   end.
 
 Definition view (m : Model.t) : html event :=
-  el_attr "section"
+  el "section"
     [ "class"=:"todoapp" ]
-    [ el_attr "header"
+    [ el "header"
         [ "class"=:"header" ]
-        [ el "h1" [ text "todos" ]
-        ; el_attr "form"
+        [ el_ "h1" [ text "todos" ]
+        ; el "form"
           [ on_with_opts "submit" prevent_default_opts (Decoder.pure AddTodo) ]
-          [ el_attr "input"
+          [ el "input"
                   [ "class"=:"new-todo"
                   ; "placeholder"=:"What needs to be done?"
                   ; "autofocus" =: ""
@@ -117,42 +117,42 @@ Definition view (m : Model.t) : html event :=
                   []
           ]
         ]
-    ; el_attr "section"
+    ; el "section"
         [ "class"=:"main" ]
-        [ el_attr "input"
+        [ el "input"
             ["type"=:"checkbox"; "id"=:"toggle-all"; "class"=:"toggle-all" ] []
-        ; el_attr "label" [ "for"=:"toggle-all" ]
+        ; el "label" [ "for"=:"toggle-all" ]
             [ text "Mark all as complete" ]
-        ; el_attr "ul" [ "class"=:"todo-list" ]
+        ; el "ul" [ "class"=:"todo-list" ]
             (map_with_index
             (fun index task =>
-                 el_attr "li"
+                 el "li"
                          (if task.(completed) then [ "class"=:"completed" ] else [])
-                         [ el_attr "div" [ "class"=:"view" ]
-                                   [ el_attr "input"
+                         [ el "div" [ "class"=:"view" ]
+                                   [ el "input"
                                              ([ "type" =: "checkbox"
                                               ; "class"=:"toggle"
                                               ; on "change" (TaskAction_ index Toggle)
                                               ] ++
                                         (if task.(completed) then ["checked"=:""] else [])) []
-                                   ; el "label" [ text task.(description) ]
-                                   ; el_attr "button"
+                                   ; el_ "label" [ text task.(description) ]
+                                   ; el "button"
                                              [ "class"=:"destroy"
                                              ; on "click" (TaskAction_ index Delete) 
                                              ] []
                                    ]
-                         ; el_attr "input" ["class"=:"edit"] []
+                         ; el "input" ["class"=:"edit"] []
                          ]
             )
             m.(tasks))
         ]
-    ; el_attr "footer" [ "class"=:"footer" ]
+    ; el "footer" [ "class"=:"footer" ]
         [ let n := num_incomplete m in
-          el_attr "span" [ "class"=:"todo-count" ]
-            [ el "strong" [ text (string_of_nat n) ]
+          el "span" [ "class"=:"todo-count" ]
+            [ el_ "strong" [ text (string_of_nat n) ]
             ; text (" " ++ pluralize n "item" "items" ++ " left")
             ]
-          ; el_attr "button" [ "class"=:"clear-completed"; on "click" ClearCompleted ]
+          ; el "button" [ "class"=:"clear-completed"; on "click" ClearCompleted ]
                     [ text "Clear completed" ]
         ]
     ].

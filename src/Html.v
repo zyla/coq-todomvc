@@ -56,13 +56,10 @@ Inductive html (A : Set) : Type :=
 | Elem : string -> list (hprop A) -> list (html A) -> html A
 | Text : string -> html A.
 
-Definition el_attr : forall {A}, string -> list (hprop A) -> list (html A) -> html A
+Definition el : forall {A}, string -> list (hprop A) -> list (html A) -> html A
 := Elem.
 Definition text : forall {A}, string -> html A := Text.
-Definition el {A} : tag_name -> list (html A) -> html A :=
-fun tag => el_attr tag [].
-Definition el_ {A} : tag_name -> html A :=
-fun tag => el_attr tag [] [].
+Definition el_ {A} : tag_name -> list (html A) -> html A := fun tag => el tag [].
 
 Notation "k =: v" := (Attr k v) (at level 75).
 

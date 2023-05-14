@@ -29,17 +29,24 @@ Inductive event :=
 
 Definition init (_ : unit) : Model.t := 0.
 
-
 Definition update (m : Model.t) (msg : event) : Model.t :=
   match msg with
   | Increment => m + 1
   | Decrement => m - 1
   end.
 
+Definition string_of_nat (n : nat) : string := NilZero.string_of_uint (Nat.to_uint n).
+
 Definition view (m : Model.t) : html event :=
-  el_attr "div"
+  el "div"
     []
-    [ text "test"
+    [ el "button"
+         [ on "click" Decrement ]
+         [ text "-" ]
+    ; text (string_of_nat m)
+    ; el "button"
+         [ on "click" Increment ]
+         [ text "+" ]
     ].
 
 End App.
