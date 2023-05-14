@@ -4,4 +4,6 @@ src/Html.v
 src/App.v
 src/Html/Extraction/JS.v
 
+src/Counter.v
+
 extraction/JS.v

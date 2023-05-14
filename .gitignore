@@ -11,6 +11,8 @@ html/
 lib/bs/
 /src/app.ml
 /src/app.mli
+/src/counter.ml
+/src/counter.mli
 *.bs.js
 \#*\#
 .bsb.lock
