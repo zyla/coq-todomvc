@@ -88,21 +88,6 @@ Definition event_possible_from_prop {A : Set} (x : A) (p: hprop A) : Prop :=
   | _ => False
   end.
 
-(*
-Fixpoint event_possible {A: Set} (x : A) (h: html A) {struct h} : Prop :=
-  match h with
-  | Elem _ _ props children =>
-    any (event_possible_from_prop x) props
-    \/ event_possible_list x children
-  | Text _ _ => False
-  end
-with event_possible_list {A: Set} (x : A) (hs: list (html A)) {struct hs} : Prop :=
-  match hs with
-  | [] => True
-  | h :: rest => event_possible x h \/ event_possible_list x rest
-  end.
-*)
-
 Inductive event_possible {A: Set} (x : A) : html A -> Prop :=
   | EP_Prop : forall tag props children,
       any (event_possible_from_prop x) props -> event_possible x (Elem A tag props children)
@@ -121,3 +106,41 @@ Inductive reachable {M E : Set} (P : M -> Prop) (from : M) (update : M -> E -> M
       reachable P from update view.
 
 Arguments R_Step {_ _ _ _}.
+
+Hint Unfold any el on on_with_opts Decoder.heq : core.
+
+Ltac find_event t :=
+  simpl; solve
+    [ apply EP_Prop; simpl; t
+    | apply EP_Here; t; find_event t
+    | apply EP_Next; t; find_event t
+    | apply EP_Children; t; find_event t ].
+
+
+Inductive always {M E : Set} (P : M -> Prop) (from : M) (update : M -> E -> M) (view : M -> html E) : Prop :=
+  | Always :
+     P from ->
+     (forall event,
+         event_possible event (view from) ->
+         always P (update from event) update view) ->
+     always P from update view.
+
+Theorem not_reachable_if_invariant_violated {M E : Set} (P : M -> Prop) (from : M) (update : M -> E -> M) (view : M -> html E) (P2 : M -> Prop) :
+  always P from update view -> (forall m, P2 m -> ~ P m) -> ~ reachable P2 from update view.
+Proof.
+  intros Halways Hno_invariant.
+  intro H.
+  induction H.
+
+  destruct Halways.
+  apply (Hno_invariant from H).
+  auto.
+
+  apply IHreachable.
+  destruct Halways.
+  apply Always.
+  apply (H2 event); auto.
+
+  intros.
+  apply (H2 event); auto.
+ Qed.
