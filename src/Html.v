@@ -111,3 +111,13 @@ Inductive event_possible {A: Set} (x : A) : html A -> Prop :=
 with event_possible_list {A: Set} (x : A) : list (html A) -> Prop :=
   | EP_Here : forall h rest, event_possible x h -> event_possible_list x (h :: rest)
   | EP_Next : forall h rest, event_possible_list x rest -> event_possible_list x (h :: rest).
+
+
+Inductive reachable {M E : Set} (P : M -> Prop) (from : M) (update : M -> E -> M) (view : M -> html E) : Prop :=
+  | R_Here : P from -> reachable P from update view
+  | R_Step : forall event,
+      event_possible event (view from) ->
+      reachable P (update from event) update view ->
+      reachable P from update view.
+
+Arguments R_Step {_ _ _ _}.

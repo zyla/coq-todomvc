@@ -66,9 +66,30 @@ Ltac find_event t :=
     | apply EP_Next; find_event t
     | apply EP_Children; find_event t ].
 
-Lemma can_always_increment : forall m, Html.event_possible Increment (view m).
+Theorem can_always_increment : forall m, Html.event_possible Increment (view m).
   intro m.
   find_event auto.
 Qed.
+
+Theorem can_go_to_5 : Html.reachable (fun m => m = 5) (init tt) update view.
+Proof.
+  do 5 (apply (R_Step update view Increment); simpl; try (find_event auto)).
+  apply R_Here.
+  reflexivity.
+Qed.
+
+Lemma can_go_to_any_number : forall n k, Html.reachable (fun m => m = n + k) k update view.
+Proof.
+  intros n.
+  induction n; intro k.
+
+  apply R_Here. reflexivity.
+
+  apply (R_Step update view Increment); try (find_event auto). simpl.
+  rewrite <- PeanoNat.Nat.add_succ_r.
+  rewrite PeanoNat.Nat.add_1_r.
+  apply (IHn (S k)).
+Qed.
+  
 
 End Proofs.
