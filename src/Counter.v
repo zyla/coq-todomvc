@@ -43,7 +43,9 @@ Definition view (m : Model.t) : html event :=
     [ el "button"
          [ on "click" Decrement ]
          [ text "-" ]
-    ; text (string_of_nat m)
+    ; el "span"
+         [ "class"=:"count" ]
+         [ text (string_of_nat m) ]
     ; el "button"
          [ on "click" Increment ]
          [ text "+" ]
@@ -51,3 +53,22 @@ Definition view (m : Model.t) : html event :=
 
 End App.
 
+Module Proofs.
+
+Import App.
+
+Hint Unfold any el on on_with_opts Decoder.heq : core.
+
+Ltac find_event t :=
+  simpl; solve
+    [ apply EP_Prop; simpl; t
+    | apply EP_Here; find_event t
+    | apply EP_Next; find_event t
+    | apply EP_Children; find_event t ].
+
+Lemma can_always_increment : forall m, Html.event_possible Increment (view m).
+  intro m.
+  find_event auto.
+Qed.
+
+End Proofs.

@@ -77,7 +77,7 @@ Search list.
 
 Fixpoint any {A : Type} (p: A -> Prop) (xs: list A) : Prop :=
   match xs with
-  | [] => True
+  | [] => False
   | x :: xs => p x \/ any p xs
   end.
 
