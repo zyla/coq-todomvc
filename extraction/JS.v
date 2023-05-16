@@ -1,6 +1,8 @@
 Require App.
 Require Counter.
+Require LimitedCounter.
 Require Html.Extraction.JS.
 
-Extraction "src/app.ml" App.App.
-Extraction "src/counter.ml" Counter.App.
+Extraction "src/App.ml" App.App.
+Extraction "src/Counter.ml" Counter.App.
+Extraction "src/LimitedCounter.ml" LimitedCounter.App.

@@ -9,10 +9,9 @@ node_modules/
 all.pdf
 html/
 lib/bs/
-/src/app.ml
-/src/app.mli
-/src/counter.ml
-/src/counter.mli
+/src/App.ml*
+/src/Counter.ml*
+/src/LimitedCounter.ml*
 *.bs.js
 \#*\#
 .bsb.lock
